@@ -1,0 +1,13 @@
+[package]
+name = "kpasswd"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+kanidm_client = "1.1"
+serde = { version = "1.0", features = ["derive"] }
+toml = "0.7"
+rpassword = "7.0"
+anyhow = "1.0"
+tokio = { version = "1", features = ["rt-multi-thread"] }
+users = "0.11"

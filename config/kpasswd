@@ -1,0 +1,4 @@
+# Configuration file for kpasswd
+server_url = "https://kanidm.example.com"
+admin_username = "admin"
+admin_password = "admin_password_here"
