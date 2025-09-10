@@ -1,6 +1,6 @@
 # kpasswd - Kanidm Password Changing Tool
 
-A simple utility for changing Kanidm user Unix passwords with SGID privileges.
+Small utility to set the Unix (sudo) password for Kanidm users authenticated by UID only, for an otherwise password-less login infrastructure.
 
 ## Features
 
