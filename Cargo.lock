@@ -2199,9 +2199,12 @@ name = "kpasswd"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "clap",
  "kanidm_client",
+ "kanidm_proto",
  "rpassword",
  "serde",
+ "serde_json",
  "tokio",
  "toml 0.7.8",
  "users",
