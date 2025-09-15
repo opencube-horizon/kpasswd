@@ -104,7 +104,8 @@ async fn add_ssh_key(username: &str, ssh_key: &str, config: &KpasswdConfig) -> R
     let client = create_kanidm_client(config).await?;
 
     // Extract the key comment/description to use as tag if available
-    let parts: Vec<&str> = ssh_key.trim().split_whitespace().collect();
+    // Split at most into 3 parts (type, data, comment)
+    let parts: Vec<&str> = ssh_key.trim().splitn(3, ' ').collect();
 
     // SSH keys typically have format: type base64-data [comment]
     // Use the comment as the tag if available, or generate one
@@ -128,6 +129,7 @@ async fn add_ssh_key(username: &str, ssh_key: &str, config: &KpasswdConfig) -> R
 async fn list_ssh_keys(username: &str, config: &KpasswdConfig) -> Result<()> {
     let client = create_kanidm_client(config).await?;
 
+    // the following was lifted directly from Kanidm
     let mut entry = match client
         .scim_v1_person_get(
             username,
@@ -153,7 +155,7 @@ async fn list_ssh_keys(username: &str, config: &KpasswdConfig) -> Result<()> {
     };
 
     for key in keys {
-        println!("{}: {}", key.label, key.value);
+        println!("Kanidm Key ID '{}': {}", key.label, key.value);
     }
     Ok(())
 }
