@@ -8,7 +8,6 @@ use serde::Deserialize;
 use std::fs::File;
 use std::io::{self, Read, Write};
 use std::path::Path;
-use tokio;
 use users::get_current_username;
 
 #[derive(Deserialize)]
@@ -68,21 +67,21 @@ fn handle_client_error(e: ClientError) -> Result<()> {
             };
             eprintln!("OperationId: {:?}", opid);
             if status == StatusCode::INTERNAL_SERVER_ERROR {
-                return Err(anyhow!("Internal Server Error in response: {}", error_msg));
+                Err(anyhow!("Internal Server Error in response: {}", error_msg))
             } else if status == StatusCode::NOT_FOUND {
-                return Err(anyhow!("User not found."));
+                Err(anyhow!("User not found."))
             } else {
-                return Err(anyhow!("HTTP Error: {}{}", status, error_msg));
+                Err(anyhow!("HTTP Error: {}{}", status, error_msg))
             }
         }
         ClientError::Transport(e) => {
-            return Err(anyhow!("HTTP-Transport Related Error: {:?}", e));
+            Err(anyhow!("HTTP-Transport Related Error: {:?}", e))
         }
         ClientError::UntrustedCertificate(e) => {
-            return Err(anyhow!("Untrusted Certificate Error: {:?}", e));
+            Err(anyhow!("Untrusted Certificate Error: {:?}", e))
         }
         _ => {
-            return Err(anyhow!("{e:?}"));
+            Err(anyhow!("{e:?}"))
         }
     }
 }
