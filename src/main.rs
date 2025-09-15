@@ -169,7 +169,7 @@ async fn delete_ssh_key(username: &str, tag: &str, config: &KpasswdConfig) -> Re
 }
 
 #[derive(Parser)]
-#[command(author, version, about, long_about = None)]
+#[command(about = "Lets users change their POSIX/sudo password and manage keys in a primarily password-less Kanidm managed environment", long_about = None)]
 struct Cli {
     /// Add an SSH public key (as it appears in ~/.ssh/authorized_keys)
     #[arg(short = 'a', long, value_name = "SSH_KEY")]
@@ -180,7 +180,7 @@ struct Cli {
     list_ssh_keys: bool,
 
     /// Delete an SSH key with the given tag/description
-    #[arg(short = 'd', long, value_name = "TAG")]
+    #[arg(short = 'd', long, value_name = "ID")]
     delete_ssh_key: Option<String>,
 }
 

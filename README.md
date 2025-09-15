@@ -10,13 +10,13 @@ Small utility to set the Unix (sudo) password for Kanidm users authenticated by 
 ## Installation
 
 1. Clone this repository
-2. Run the installation script:
+2. Build it:
+   ```console
+   ~> cargo build
    ```
-   cargo build
-   ```
-3. Edit the configuration file with your Kanidm server details:
-   ```
-   sudo nano /etc/kanidm/kpasswd
+3. Create the configuration file with your Kanidm server details and a privileged user:
+   ```console
+   ~> sudo nano /etc/kanidm/kpasswd
    ```
 
 ## Configuration
@@ -30,18 +30,18 @@ admin_password = "admin_password"
 ```
 
 Make sure the file has secure permissions:
-```
-sudo chmod 640 /etc/kanidm/kpasswd.toml
-sudo chown root:shadow /etc/kanidm/kpasswd /usr/local/bin/kanidm
-sudo chmod g+s /usr/local/bin/kanidm
+```console
+~> sudo chmod 640 /etc/kanidm/kpasswd.toml
+~> sudo chown root:shadow /etc/kanidm/kpasswd /usr/local/bin/kanidm
+~> sudo chmod g+s /usr/local/bin/kanidm
 ```
 
 ## Usage
 
 Simply run:
 
-```
-kpasswd
+```console
+~> kpasswd
 ```
 
 The tool will:
@@ -50,7 +50,21 @@ The tool will:
 3. Confirm the password
 4. Change your password on the Kanidm server
 
+The tool can also manage the users SSH keys:
+
+```
+~> kpasswd --help
+Usage: kpasswd [OPTIONS]
+
+Options:
+  -a, --add-ssh-key <SSH_KEY>  Add an SSH public key (as it appears in ~/.ssh/authorized_keys)
+  -l, --list-ssh-keys          List all SSH keys
+  -d, --delete-ssh-key <TAG>   Delete an SSH key with the given tag/description
+  -h, --help                   Print help
+  -V, --version                Print version
+```
+
 ## Security Notes
 
-- The binary should have the SGID bit set to allow password changing with elevated privileges
-- The configuration file should be readable only by root and the privileged group (shadow)
+- The binary should have the SGID bit set to allow password changing without giving the calling user access to the privileged credentials.
+- The configuration file should be readable only by root and the privileged group (shadow).
