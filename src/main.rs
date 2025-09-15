@@ -74,15 +74,11 @@ fn handle_client_error(e: ClientError) -> Result<()> {
                 Err(anyhow!("HTTP Error: {}{}", status, error_msg))
             }
         }
-        ClientError::Transport(e) => {
-            Err(anyhow!("HTTP-Transport Related Error: {:?}", e))
-        }
+        ClientError::Transport(e) => Err(anyhow!("HTTP-Transport Related Error: {:?}", e)),
         ClientError::UntrustedCertificate(e) => {
             Err(anyhow!("Untrusted Certificate Error: {:?}", e))
         }
-        _ => {
-            Err(anyhow!("{e:?}"))
-        }
+        _ => Err(anyhow!("{e:?}")),
     }
 }
 
