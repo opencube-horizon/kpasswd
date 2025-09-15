@@ -52,7 +52,7 @@ The tool will:
 
 The tool can also manage the users SSH keys:
 
-```
+```console
 ~> kpasswd --help
 Usage: kpasswd [OPTIONS]
 
