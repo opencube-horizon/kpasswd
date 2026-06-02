@@ -6,9 +6,18 @@ on:
       - 'v*'
 
 jobs:
-  build-and-release:
-    name: Build and release
-    runs-on: ubuntu-latest
+  build:
+    name: Build (${{ matrix.target }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - target: x86_64-unknown-linux-gnu
+            runner: ubuntu-24.04
+            artifact: kpasswd-x86_64-linux
+          - target: aarch64-unknown-linux-gnu
+            runner: ubuntu-24.04-arm
+            artifact: kpasswd-aarch64-linux
 
     steps:
     - uses: actions/checkout@v5
@@ -16,19 +25,35 @@ jobs:
     - name: Install Rust
       uses: actions-rust-lang/setup-rust-toolchain@v1
 
-    - name: Build x86_64 release
-      run: cargo build --release --target x86_64-unknown-linux-gnu
+    - name: Build release
+      env:
+        OPENSSL_STATIC: "1"
+      run: cargo build --release
 
-    - name: Rename binaries
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.artifact }}
+        path: target/release/kpasswd
+
+  release:
+    name: Create release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Prepare release files
       run: |
-        mkdir -p release
-        cp target/x86_64-unknown-linux-gnu/release/kpasswd release/kpasswd-x86_64-linux
+        mkdir release
+        mv artifacts/kpasswd-x86_64-linux/kpasswd release/kpasswd-x86_64-linux
+        mv artifacts/kpasswd-aarch64-linux/kpasswd release/kpasswd-aarch64-linux
+        chmod +x release/*
 
     - name: Create GitHub Release
-      id: create_release
-      uses: softprops/action-gh-release@v2
-      with:
-        files: |
-          release/kpasswd-x86_64-linux
-        draft: false
-        prerelease: false
+      env:
+        GH_TOKEN: ${{ github.token }}
+      run: gh release create "${{ github.ref_name }}" release/* --generate-notes --repo "${{ github.repository }}"
