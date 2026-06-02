@@ -2,3 +2,7 @@
 server_url = "https://kanidm.example.com"
 admin_username = "admin"
 admin_password = "admin_password_here"
+
+# Set to true to allow setting a password without providing the current one.
+# Only enable this during initial rollout when users don't have passwords yet.
+# allow_set_without_current = false

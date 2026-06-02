@@ -1,6 +1,7 @@
 # kpasswd - Kanidm Password Changing Tool
 
-Small utility to set the Unix (sudo) password for Kanidm users authenticated by UID only, for an otherwise password-less login infrastructure.
+Small utility to set the Unix (sudo) password for Kanidm users.
+Optionally "authenticated" by UID only, for an otherwise password-less login infrastructure.
 
 ## Features
 
@@ -27,6 +28,10 @@ The `/etc/kanidm/kpasswd.toml` file should contain:
 server_url = "https://your-kanidm-server.com"
 admin_username = "admin_account"
 admin_password = "admin_password"
+
+# Set to true to allow setting a password without providing the current one.
+# Only enable this during initial rollout when users don't have passwords yet.
+# allow_set_without_current = false
 ```
 
 Make sure the file has secure permissions:

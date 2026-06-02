@@ -15,6 +15,8 @@ struct KpasswdConfig {
     server_url: String,
     admin_username: String,
     admin_password: String,
+    #[serde(default)]
+    allow_set_without_current: bool,
 }
 
 fn read_config_file(path: &Path) -> Result<KpasswdConfig> {
@@ -79,6 +81,23 @@ fn handle_client_error(e: ClientError) -> Result<()> {
             Err(anyhow!("Untrusted Certificate Error: {:?}", e))
         }
         _ => Err(anyhow!("{e:?}")),
+    }
+}
+
+async fn verify_current_password(
+    username: &str,
+    current_password: &str,
+    config: &KpasswdConfig,
+) -> Result<()> {
+    let client = create_kanidm_client(config).await?;
+
+    match client
+        .idm_account_unix_cred_verify(username, current_password)
+        .await
+    {
+        Ok(Some(_)) => Ok(()),
+        Ok(None) => Err(anyhow!("Current password is incorrect.")),
+        Err(e) => handle_client_error(e),
     }
 }
 
@@ -230,10 +249,17 @@ async fn main() -> Result<()> {
             }
         }
     } else {
-        // Default behavior: Change Unix password
         println!("Changing password for user: {}", username.to_string_lossy());
 
-        // Ask for new password
+        if !config.allow_set_without_current {
+            print!("Current Password: ");
+            io::stdout().flush()?;
+            let current_password = read_password()?;
+
+            verify_current_password(&username.to_string_lossy(), &current_password, &config)
+                .await?;
+        }
+
         print!("New Password: ");
         io::stdout().flush()?;
         let new_password = read_password()?;
@@ -242,12 +268,10 @@ async fn main() -> Result<()> {
         io::stdout().flush()?;
         let confirm_password = read_password()?;
 
-        // Verify passwords match
         if new_password != confirm_password {
             return Err(anyhow!("Passwords do not match"));
         }
 
-        // Change the password
         match change_password(&username.to_string_lossy(), &new_password, &config).await {
             Ok(_) => {
                 println!("Password changed successfully");
