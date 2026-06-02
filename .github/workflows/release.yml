@@ -17,10 +17,10 @@ jobs:
             artifact: kpasswd-x86_64-linux
           - target: aarch64-unknown-linux-gnu
             runner: ubuntu-24.04-arm
-            artifact: kpasswd-aarch64-linux
+            artifact: kpasswd-arm64-linux
 
     steps:
-    - uses: actions/checkout@v5
+    - uses: actions/checkout@v6
 
     - name: Install Rust
       uses: actions-rust-lang/setup-rust-toolchain@v1
@@ -31,7 +31,7 @@ jobs:
       run: cargo build --release
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v7
       with:
         name: ${{ matrix.artifact }}
         path: target/release/kpasswd
@@ -39,10 +39,10 @@ jobs:
   release:
     name: Create release
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/download-artifact@v4
+    - uses: actions/download-artifact@v8
       with:
         path: artifacts
 
@@ -50,7 +50,7 @@ jobs:
       run: |
         mkdir release
         mv artifacts/kpasswd-x86_64-linux/kpasswd release/kpasswd-x86_64-linux
-        mv artifacts/kpasswd-aarch64-linux/kpasswd release/kpasswd-aarch64-linux
+        mv artifacts/kpasswd-arm64-linux/kpasswd release/kpasswd-arm64-linux
         chmod +x release/*
 
     - name: Create GitHub Release
